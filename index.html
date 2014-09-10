@@ -1,0 +1,127 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <title>Jammer</title>
+  </head>
+  <body>
+    <div id="player" class="player"></div>
+    <div id="jam"><div class="loading">Loading ...</div></div>
+
+    <script id="jam-template" type="text/html">
+      <div class="behind" style="background-image: url(<%=track.jamvatarLarge%>)">
+        <article>
+          <header>
+            <h1><%=track.title%></h1>
+            <h2><%=track.artist%></h2>
+            <menu class="controls">
+              <div class="cursor"><%=cursor%></div>
+              <ul>
+                <li><span class="link prev">prev</span></li>
+                <li><span class="link play-pause">play / pause</span></li>
+                <li><span class="link next">next</span></li>
+              </ul>
+            </menu>
+          </header>
+          <div role="main">
+            <ul>
+              <% for(var i = 0; i<jams.length; i++){ %>
+                <% if(i == index) { %>
+                  <li class="link"><%=jams[i].title%>, <%=jams[i].artist%></li>
+                <% } else { %>
+                  <li><%=jams[i].title%>, <%=jams[i].artist%></li>
+                <% } %>
+              <% }; %>
+            </ul>
+          </div>
+          <footer>
+            Powered by <a href="http://thisismyjam.com">this is my Jam</a>
+          </footer>
+        </article>
+      </div>
+    </script>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+    <script>
+
+      function onYouTubeIframeAPIReady(){
+
+        var jams,
+            jamTemplate = $('#jam-template').html(),
+            $jam = $('#jam'),
+            cursor = 0,
+            player;
+
+        $jam.on('click', function(e){
+
+          $target = $(e.target);
+
+          if($target.hasClass('next')){
+            ++cursor;
+            if(cursor >= jams.length){
+              cursor = 0;
+            }
+            next(cursor);
+          }
+          if($target.hasClass('prev')){
+            --cursor
+            if(cursor < 0){
+              cursor = jams.length-1;
+            }
+            next(cursor);
+          }
+          if($target.hasClass('play-pause')){
+            switch(player.getPlayerState()){
+              case 1:
+                player.pauseVideo();
+              break;
+              case 2:
+                player.playVideo();
+              break;
+            }
+          }
+
+        });
+
+        function videoID(url){
+          return url.split('v=')[1];
+        }
+
+        function next(cursor){
+          var current = jams[cursor];
+          $jam.empty().html(_.template(jamTemplate, {
+            track: current,
+            cursor: (cursor+1) + ' / ' + jams.length,
+            jams: jams,
+            index: cursor
+          }));
+          player.loadVideoById(videoID(current.viaUrl));
+        }
+
+        window.onPlayerReady = function(){
+          next(0);
+        }
+
+        window.onPlayerStateChange = function(){
+          // console.log('player state change');
+        }
+
+        $.getJSON('http://api.thisismyjam.com/1/n/jams.json?callback=?', function(data){
+
+          jams = data.jams;
+
+          player = new YT.Player('player', {
+            height: 0,
+            events: {
+              'onReady': onPlayerReady,
+              'onStateChange': onPlayerStateChange
+            }
+          });
+
+        });
+      }
+
+    </script>
+  </body>
+</html>

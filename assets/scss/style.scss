@@ -1,0 +1,72 @@
+@import "compass/css3";
+@import "compass/reset";
+
+html{
+  font-family: arial;
+}
+
+
+.player {
+  position: absolute;
+  left: -100000px;
+}
+
+.behind{
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+article {
+  padding: 50px;
+  line-height: 1.75;
+  color: #fff;
+  background: rgba(0,0,0,.8);
+  header, figure{
+    // float: left;
+  }
+  header{
+    // margin-left: 30px;
+    h1,h2{
+      font-weight: bold;
+    }
+    h1{
+      font-size: 52px;
+      // font-family: 'arial black';
+    }
+    h2{
+      font-size: 22px;
+    }
+    menu{
+      ul{
+        li{
+          display: inline;
+          font-size: 31px;
+          &:not(:last-child):after{
+            content: ' | ';
+            color: rgba(255,255,255, 0.2);
+          }
+        }
+      }
+    }
+  }
+  footer{
+    padding-top: 50px;
+  }
+}
+
+
+
+a, .link{
+  color: #f90;
+  text-decoration: underline;
+  cursor: pointer;
+  &:hover{
+    text-decoration: none;
+  }
+}
+
+[role=main]{
+  clear: both;
+  padding-top: 50px;
+}
